@@ -3,7 +3,7 @@
 
 int fire_time=0;
 
-Game2D::Game2D(QWidget *parent) : QWidget(parent), state_(0), score_(0), level_(1), direction_(0), delay_(0), timer_id_(0)
+Game2D::Game2D(QWidget *parent) : QWidget(parent), state_(0), score_(0), level_(1), direction_(0), delay_(0), pause_(0), timer_id_(0)
 {
 
 }
@@ -162,6 +162,8 @@ bool Game2D::event(QEvent *event){
              case Qt::Key_Tab: nextLevel (); break;
 
              case Qt::Key_Backspace: prevLevel (); break;
+
+             case Qt::Key_Pause: setPause (); break;
          }
 
          return true;
@@ -183,6 +185,8 @@ bool isInInterval (int x, int x1, int x2){
 }
 
 void Game2D::timer(){
+    if (pause()) return;
+
     if (!evec_.size() && state_==1){
         //if (level () >=2) state_=2;
         //else

@@ -23,6 +23,7 @@ private:
     int time_;
     int direction_;
     int delay_;
+    bool pause_;
 
     int timer_id_;
 
@@ -38,6 +39,7 @@ public:
     int time () const { return time_;}
     int direction () const { return direction_;}
     int delay () const { return delay_;}
+    bool pause () const { return pause_;}
 
     void setState (int v){ state_=v;}
     void setScore (int v){ score_=v;}
@@ -45,6 +47,7 @@ public:
     void setTime (int v){ time_=v;}
     void setDirection (int v){ direction_=v;}
     void setDelay (int v){ delay_=v;}
+    void setPause (){ pause_=!pause_;}
 
     void incLevel (){ ++level_; }
     void incTime (){ time_+=delay_; }
