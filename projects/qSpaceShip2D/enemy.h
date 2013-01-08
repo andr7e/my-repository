@@ -8,8 +8,22 @@ public:
     virtual void draw (QPainter &p, int direction=0){
         int w=width();
         int h=height();
+        int a=255*health ()/maxHealth ();
 
-        p.setBrush(QColor (255, 0, 0, 255*health ()/maxHealth ()));
+        switch (type()){
+            case 0:{
+                p.setBrush(QColor (255, 200, 0, a));
+            }break;
+
+            case 1:{
+                p.setBrush(QColor (255, 100, 0, a));
+            }break;
+
+            case 2:{
+                p.setBrush(QColor (255, 0, 0, a));
+            }break;
+        }
+
         p.setPen(Qt::white);
 
         p.drawRect (x(), y(), w, h);

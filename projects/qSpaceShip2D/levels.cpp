@@ -22,72 +22,142 @@ initEnemy (){
 
     switch (level()){
         case 5:
-        case 1:{
-            y=120;
-            addEnemyLine (0, y, size, 8);
-
-            y+=size;
-            addEnemyLine (0, y, size, 8, 1);
-
-            y+=size;
-            addEnemyLine (0, y, size, 8, 2);
-        }break;
+        setMovable (1);
+        case 1: genLevel1 (size, 0); break;
 
         case 6:
+        setMovable (1);
         case 2:{
-            y=120;
-            addEnemyLine (0, y, size, 2, 1);
-
-            y+=size;
-            addEnemyLine (0, y, size, 4, 1);
-
-            y+=size;
-            addEnemyLine (0, y, size, 6, 1);
-
-            y+=size;
-            addEnemyLine (0, y, size, 4, 1);
-
-            y+=size;
-            addEnemyLine (0, y, size, 2, 1);
-
-            y+=size*2;
-            addEnemyLine (0, y, size, 10, 1);
+            genLevel2 (size, 0); break;
         }break;
 
         case 3:{
-            y=20+myrand (0, 100);
-
-            for (int i=0; i<10; i++){
-                addEnemyLine (0, y, size, myrand (2, 10), myrand (0, 3));
-                y+=size;
-            }
+            genLevel3 (size, 0);
         }break;
 
         case 4:{
-            int size = myrand (20, 40);
-            int y=0;
-            while (enemy_count < ENEMY_COUNT_MAX){
-                size = myrand (20, 40);
-                y-=size;
-                addEnemy (myrand (0, width ()-size), y, size);
-                ++enemy_count;
-            }
+            setMovable (1);
+            genLevel4 (size, 0);
         }break;
 
         case 7:{
-            int size = myrand (20, 40);
-            int y=0;
-            while (enemy_count < ENEMY_COUNT_MAX*3){
-                size = myrand (20, 40);
-                int new_enemy=myrand (1, 8);
-                y-=size;
-                addEnemyLine (0, y, size, new_enemy, myrand (0, 3));
-                enemy_count+=new_enemy;
-            }
+            genLevel7 (size, 0); break;
+        }break;
+
+        case 12:
+        setMovable (1);
+        case 8: genLevel1 (size, 1); break;
+
+        case 13:
+        setMovable (1);
+        case 9: genLevel2 (size, 1); break;
+
+        case 10: genLevel3 (size, 1); break;
+
+        case 11:{
+            setMovable (1);
+            genLevel4 (size, 1);
+        }break;
+
+        case 14:{
+            genLevel7 (size, 1); break;
         }break;
     }
 }
 
+void
+Game2D::
+genLevel1 (int size, int var){
+    int y=120;
+    int type=0;
+
+    if (var) type=2;
+    addEnemyLine (0, y, size, 8, type, 0);
+
+    if (var) type=1;
+    y+=size;
+    addEnemyLine (0, y, size, 8, type, 1);
+
+    if (var) type=0;
+    y+=size;
+    addEnemyLine (0, y, size, 8, type, 2);
+}
+
+void
+Game2D::
+genLevel2 (int size, int var){
+    int y=120;
+    int type=0;
+
+    if (var) type=0;
+    addEnemyLine (0, y, size, 2, type, 1);
+
+    if (var) type=1;
+    y+=size;
+    addEnemyLine (0, y, size, 4, type, 1);
+
+    if (var) type=2;
+    y+=size;
+    addEnemyLine (0, y, size, 6, type, 1);
+
+    if (var) type=1;
+    y+=size;
+    addEnemyLine (0, y, size, 4, type, 1);
+
+    if (var) type=0;
+    y+=size;
+    addEnemyLine (0, y, size, 2, type, 1);
+
+    if (var) type=2;
+    y+=size*2;
+    addEnemyLine (0, y, size, 10, type, 1);
+}
+
+void
+Game2D::
+genLevel3 (int size, int var){
+    int y=20+myrand (0, 100);
+    int type=0;
+
+    for (int i=0; i<10; i++){
+        if (var) type=myrand (0, 3);
+        addEnemyLine (0, y, size, myrand (2, 10), type, myrand (0, 3));
+        y+=size;
+    }
+}
+
+void
+Game2D::
+genLevel4 (int size, int var){
+    setMovable (1);
+    size = myrand (20, 40);
+    int y=0;
+    int type=0;
+    while (enemy_count < ENEMY_COUNT_MAX){
+        size = myrand (20, 40);
+        y-=size;
+        if (var) type=myrand (0, 3);
+        addEnemy (myrand (0, width ()-size), y, size, type);
+        ++enemy_count;
+    }
+}
+
+void
+Game2D::
+genLevel7 (int size, int var){
+    setMovable (1);
+    size = myrand (20, 40);
+    int y=0;
+    int type=0;
+    while (enemy_count < ENEMY_COUNT_MAX*3){
+        size = myrand (20, 40);
+        int new_enemy=myrand (1, 8);
+        y-=size;
+        if (var) type=myrand (0, 3);
+        addEnemyLine (0, y, size, new_enemy, type, myrand (0, 3));
+        enemy_count+=new_enemy;
+    }
+}
 
 void
 Game2D::

@@ -8,7 +8,9 @@
 
 #define FIRE_TIME_MAX 5
 
-#define DEFAULT_SPEED_DELAY 30
+#define DEFAULT_SPEED_DELAY 25
+
+#define LEVEL_FILE "level.txt"
 
 int myrand (int min, int max);
 
@@ -24,9 +26,11 @@ private:
     int direction_;
     int delay_;
     bool pause_;
+    bool movable_;
 
     int timer_id_;
 
+    Unit bg_;
     Ship ship_;
     std::vector <Enemy> evec_;
 
@@ -40,6 +44,7 @@ public:
     int direction () const { return direction_;}
     int delay () const { return delay_;}
     bool pause () const { return pause_;}
+    bool movable () const { return movable_;}
 
     void setState (int v){ state_=v;}
     void setScore (int v){ score_=v;}
@@ -48,6 +53,7 @@ public:
     void setDirection (int v){ direction_=v;}
     void setDelay (int v){ delay_=v;}
     void setPause (){ pause_=!pause_;}
+    void setMovable (bool v){ movable_=v;}
 
     void incLevel (){ ++level_; }
     void incTime (){ time_+=delay_; }
@@ -67,8 +73,8 @@ public:
         start ();
     }
 
-    void addEnemy (int x, int y, int size);
-    void addEnemyLine (int x, int y, int size, int count, int align=0);
+    void addEnemy (int x, int y, int size, int type=0);
+    void addEnemyLine (int x, int y, int size, int count, int type=0, int align=0);
     void moveEnemy ();
 
     void drawBackground (QPainter &p);
@@ -78,11 +84,22 @@ public:
     void timer();
     void paint(QPainter &p);
 
+    void genLevel1 (int size, int var);
+    void genLevel2 (int size, int var);
+    void genLevel3 (int size, int var);
+    void genLevel4 (int size, int var);
+    void genLevel7 (int size, int var);
+
+    void readLevel ();
+    void writeLevel ();
+
     //events
     void paintEvent (QPaintEvent *);
     void timerEvent(QTimerEvent *);
     bool event(QEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *);
+
+    void closeEvent(QCloseEvent *event);
     //void keyPressEvent(QKeyEvent *ke);
 
 /*

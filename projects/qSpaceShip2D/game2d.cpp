@@ -3,7 +3,7 @@
 
 int fire_time=0;
 
-Game2D::Game2D(QWidget *parent) : QWidget(parent), state_(0), score_(0), level_(1), direction_(0), delay_(0), pause_(0), timer_id_(0)
+Game2D::Game2D(QWidget *parent) : QWidget(parent), state_(0), score_(0), level_(1), direction_(0), delay_(0), pause_(0), movable_(0), timer_id_(0)
 {
 
 }
@@ -15,8 +15,13 @@ init (){
     score_=0;
     time_=0;
     direction_=0;
+    movable_=0;
 
     delay_=DEFAULT_SPEED_DELAY;
+
+    if (!bg_.isLoad ()){
+        bg_.loadImage ("bg.png");
+    }
 
     killTimer (timer_id_);
     timer_id_=startTimer (delay_);
@@ -25,8 +30,6 @@ init (){
 void
 Game2D::
 initShip (){
-    ship_.setX((width() - ship_.width ())/2);
-    ship_.setY(height());
     ship_.setFire (0);
     ship_.setHealth(100);
     ship_.setMaxHealth(100);
@@ -35,30 +38,49 @@ initShip (){
         ship_.loadImage ("ship.png");
         ship_.scale (4, 3);
     }
+
+    ship_.setX((width() - ship_.width ())/2);
+    ship_.setY(height() - ship_.height ());
 }
 
 void
 Game2D::
-addEnemy (int x, int y, int size){
+addEnemy (int x, int y, int size, int type){
     Enemy enemy;
     enemy.setX(x);
     enemy.setY(y);
     enemy.setSize (size);
 
-    enemy.setHealth(100);
-    enemy.setMaxHealth(100);
+    enemy.setType (type);
+
+    switch (type){
+        case 0:{
+            enemy.setHealth(100);
+            enemy.setMaxHealth(100);
+        }break;
+
+        case 1:{
+            enemy.setHealth(300);
+            enemy.setMaxHealth(300);
+        }break;
+
+        case 2:{
+            enemy.setHealth(500);
+            enemy.setMaxHealth(500);
+        }break;
+    }
 
     evec_.push_back(enemy);
 }
 
 void
 Game2D::
-addEnemyLine (int x, int y, int size, int count, int align){
+addEnemyLine (int x, int y, int size, int count, int type, int align){
     if (align==1) x=x+width()/2-size*count/2;
     if (align==2) x=x+width()-size*count;
 
     for (int i=0; i<count; i++){
-        addEnemy (x, y, size);
+        addEnemy (x, y, size, type);
         x+=size;
     }
 }
@@ -74,8 +96,11 @@ start (){
 }
 
 void Game2D::drawBackground (QPainter &p){
-    p.setBrush(Qt::black);
-    p.drawRect(0, 0, width(), height ());
+    if (!bg_.isLoad ()){
+        p.setBrush(Qt::black);
+        p.drawRect(0, 0, width(), height ());
+    }
+    else bg_.draw (p);
 }
 
 void Game2D::drawLabels (QPainter &p){
@@ -111,7 +136,7 @@ void Game2D::drawState (QPainter &p){
         QString str;
         if (!pause()){
             if (state_==0) str="START";
-            else str="FINISH";
+            else str="Game over";
         }else str="PAUSE";
         p.drawText(0, 0, width(), height(), Qt::AlignCenter, str);
     }
@@ -122,6 +147,9 @@ void Game2D::paint(QPainter &p){
     drawBackground (p);
 
     for (int i=0; i<evec_.size(); i++) evec_[i].draw (p);
+
+    if (state_==2) ship_.setType(1);
+    else ship_.setType(0);
 
     ship_.draw (p, direction_);
 
@@ -284,8 +312,7 @@ void Game2D::timer(){
         }
 
         incTime ();
-        if (level() > 3)
-            moveEnemy ();
+        if (movable()) moveEnemy ();
     }
 }
 
@@ -294,6 +321,40 @@ void Game2D::timerEvent(QTimerEvent *){
     timer ();
 
     emit update();
+}
+
+#include <fstream>
+void Game2D::closeEvent(QCloseEvent *event)
+{
+    //qDebug () << "close";
+
+    writeLevel ();
+
+    event->accept();
+}
+
+void Game2D::writeLevel ()
+{
+    std::ofstream out (LEVEL_FILE);
+
+    out << level();
+
+    out.close();
+}
+
+void Game2D::readLevel ()
+{
+    std::ifstream in (LEVEL_FILE);
+
+    if (in){
+        int level=0;
+
+        in >> level;
+
+        if (level>1) setLevel(level);
+
+        in.close();
+    }
 }
 
 int myrand (int min, int max){

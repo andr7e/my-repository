@@ -8,6 +8,7 @@
 class Unit{
     int x_;
     int y_;
+    int type_;
     int size_;
     int step_;
     bool load_;
@@ -16,7 +17,7 @@ class Unit{
     QPixmap pixmap_;
 
 public:
-    Unit () : x_(0), y_(0), size_(DEFAULT_UNIT_SIZE), step_(1), load_(0), health_(1), max_health_(1) {
+    Unit () : x_(0), y_(0), type_(0), size_(DEFAULT_UNIT_SIZE), step_(1), load_(0), health_(1), max_health_(1) {
 
     }
 
@@ -63,6 +64,9 @@ public:
     int size () const { return size_; }
     void setSize (int size) { size_=size; }
 
+    int type () const { return type_; }
+    void setType (int t){ type_=t; }
+
     int health () const { return health_; }
     void setHealth (int health) { health_=health; }
     void addHealth (int health) { health_+=health; }
@@ -101,7 +105,7 @@ public:
 
     virtual void draw (QPainter &p, int direction=0){
         if (!load_){
-            p.setBrush(Qt::red);
+            p.setBrush(Qt::black);
             p.setPen(Qt::white);
 
             p.drawRect (x(), y(), width(), height());

@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     */
     Game2D w;
     w.setFixedSize(480, 640);
+    w.readLevel ();
     w.start ();
     w.show ();
     

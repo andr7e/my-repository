@@ -9,8 +9,11 @@ draw (QPainter &p, int direction){
     int w=width();
     int h=height();
 
-    QBrush brush(QColor(255,255,255,100));
-    p.setBrush(brush);
+    QColor color;
+    if (type ()==0) color=QColor(80,255,80,200);
+    else color=QColor(255,0,0,255);
+
+    p.setBrush(color);
 
     p.drawRect (x(), y(), w, h);
 

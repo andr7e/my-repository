@@ -10,9 +10,8 @@ class Ship : public Unit{
     int len_;
 
 public:
-    Ship () : Unit () {
-        fire_=0;
-        len_=DEFAULT_LASER_LEN;
+    Ship () : Unit (), fire_(0), len_(DEFAULT_LASER_LEN){
+
     }
 
     ~Ship (){
@@ -20,7 +19,7 @@ public:
     }
 
     bool fire () const { return fire_; }
-    void setFire (int f){ fire_=f; }
+    void setFire (bool f){ fire_=f; }
 
     bool len () const { return len_; }
     void setLen (int l){ len_=l; }
