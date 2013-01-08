@@ -101,7 +101,7 @@ void Game2D::drawLabels (QPainter &p){
 }
 
 void Game2D::drawState (QPainter &p){
-    if (state_!=1){
+    if (state_!=1 || pause ()){
         QFont font;
         font.setPixelSize(50);
         p.setFont(font);
@@ -109,8 +109,10 @@ void Game2D::drawState (QPainter &p){
         p.setPen (Qt::white);
 
         QString str;
-        if (state_==0) str="START";
-        else str="FINISH";
+        if (!pause()){
+            if (state_==0) str="START";
+            else str="FINISH";
+        }else str="PAUSE";
         p.drawText(0, 0, width(), height(), Qt::AlignCenter, str);
     }
 }
