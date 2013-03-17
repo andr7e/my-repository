@@ -49,6 +49,7 @@ public slots:
     void executeApplicationSlot (QAction *action);
 
     void editSlot ();
+    void editListSlot ();
     void applySlot ();
     
 private:
@@ -60,6 +61,7 @@ private:
     QToolBar *iconBar_;
     Ui::DesktopWidget *ui;
 
+    QVariantList itemPaths_;
     QVector<DesktopItem> items;
 };
 

@@ -39,9 +39,14 @@ void DesktopWidget::removeItems ()
 void DesktopWidget::createView ()
 {
 
+    /*
     addItem ("/usr/share/applications/gimp.desktop");
     addItem ("/usr/share/applications/qtcreator.desktop");
+    */
 
+    itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop";
+
+    for (int i=0; i < itemPaths_.size(); i++) addItem (itemPaths_[i].toString());
 
     iconBar_ = new QToolBar;
 
@@ -98,6 +103,8 @@ void DesktopWidget::mouseMoveEvent (QMouseEvent *pe)
 
 #define KEY_ICON_SIZE_STRING "/settings/icon-size"
 
+#define KEY_ITEMS_LIST_STRING "/settings/items-list"
+
 void DesktopWidget::readSettings ()
 {
     //qDebug () << Q_FUNC_INFO;
@@ -107,6 +114,8 @@ void DesktopWidget::readSettings ()
     QSize size = s.value (KEY_SIZE_STRING, QSize (200,200)).toSize();
 
     iconSize_ = s.value (KEY_ICON_SIZE_STRING, 64).toInt();
+
+    itemPaths_ = s.value (KEY_ITEMS_LIST_STRING, QVariantList()).toList();
 
     //qDebug () << size.width ();
 
@@ -122,6 +131,8 @@ void DesktopWidget::writeSettings ()
     s.setValue (KEY_SIZE_STRING, size ());
 
     s.setValue (KEY_ICON_SIZE_STRING, iconSize_);
+
+    s.setValue (KEY_ITEMS_LIST_STRING, itemPaths_);
 
     qDebug () << Q_FUNC_INFO << width() << " " << height();
 }
@@ -168,6 +179,11 @@ void DesktopWidget::editSlot ()
     show ();
 }
 
+void DesktopWidget::editListSlot ()
+{
+
+}
+
 void DesktopWidget::applySlot ()
 {
     iconSize_ = ui->spinBox->value();
@@ -212,7 +228,8 @@ void DesktopWidget::contextMenuEvent(QContextMenuEvent *event)
     QAction *editAct = menu.addAction(tr("Edit"));
     connect (editAct, SIGNAL(triggered()), SLOT(editSlot()));
 
-    menu.addAction(tr("Settings"));
+    QAction *editListAct = menu.addAction(tr("Edit List"));
+    connect (editListAct, SIGNAL(triggered()), SLOT(editListSlot()));
 
     QAction *exitAct = menu.addAction(tr("Exit"));
     connect (exitAct, SIGNAL(triggered()), SLOT(close()));
