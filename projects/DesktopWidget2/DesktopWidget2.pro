@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         desktopwidget.cpp \
     desktopitem.cpp \
-    utils.cpp
+    utils.cpp \
+    windowsettings.cpp
 
 HEADERS  += desktopwidget.h \
     desktopitem.h \
-    utils.h
+    utils.h \
+    windowsettings.h
 
 FORMS    += desktopwidget.ui

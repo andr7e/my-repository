@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QToolBar>
 
+#include "windowsettings.h"
 #include "desktopitem.h"
 
 #define MAX_ACTION 128
@@ -15,7 +16,7 @@ class DesktopWidget;
 }
 
 
-class DesktopWidget : public QWidget
+class DesktopWidget : public QWidget, public WindowSettings
 {
     Q_OBJECT
 

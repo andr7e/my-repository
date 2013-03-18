@@ -44,7 +44,7 @@ void DesktopWidget::createView ()
     addItem ("/usr/share/applications/qtcreator.desktop");
     */
 
-    itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop";
+    //itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop";
 
     for (int i=0; i < itemPaths_.size(); i++) addItem (itemPaths_[i].toString());
 
@@ -98,9 +98,6 @@ void DesktopWidget::mouseMoveEvent (QMouseEvent *pe)
 
 //////////////settings////////////////////
 
-#define KEY_POS_STRING "/settings/pos"
-#define KEY_SIZE_STRING "/settings/size"
-
 #define KEY_ICON_SIZE_STRING "/settings/icon-size"
 
 #define KEY_ITEMS_LIST_STRING "/settings/items-list"
@@ -109,9 +106,12 @@ void DesktopWidget::readSettings ()
 {
     //qDebug () << Q_FUNC_INFO;
 
+    QPoint pos (0,50);
+    QSize size (200,200);
+
+    readWindowSettings (pos, size);
+
     QSettings s;
-    QPoint pos = s.value (KEY_POS_STRING, QPoint (0,50)).toPoint();
-    QSize size = s.value (KEY_SIZE_STRING, QSize (200,200)).toSize();
 
     iconSize_ = s.value (KEY_ICON_SIZE_STRING, 64).toInt();
 
@@ -126,9 +126,9 @@ void DesktopWidget::writeSettings ()
 {
     //qDebug () << Q_FUNC_INFO;
 
+    writeWindowSettings (pos (), size ());
+
     QSettings s;
-    s.setValue (KEY_POS_STRING, pos ());
-    s.setValue (KEY_SIZE_STRING, size ());
 
     s.setValue (KEY_ICON_SIZE_STRING, iconSize_);
 
