@@ -16,11 +16,14 @@ SOURCES += main.cpp\
         desktopwidget.cpp \
     desktopitem.cpp \
     utils.cpp \
-    windowsettings.cpp
+    windowsettings.cpp \
+    desktopwidgetdialog.cpp
 
 HEADERS  += desktopwidget.h \
     desktopitem.h \
     utils.h \
-    windowsettings.h
+    windowsettings.h \
+    desktopwidgetdialog.h
 
-FORMS    += desktopwidget.ui
+FORMS    += desktopwidget.ui \
+    desktopwidgetdialog.ui

@@ -12,7 +12,8 @@ QIcon getResizedIcon (const QString &fname, const QSize &size)
         icon = QIcon (fname);
     }
 
-    if (!icon.isNull()){
+    if (!icon.isNull())
+    {
         QPixmap pixmap = icon.pixmap (size);
         icon = QIcon (pixmap);
     }

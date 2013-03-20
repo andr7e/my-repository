@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QMenu>
 
+#include "desktopwidgetdialog.h"
 #include "utils.h"
 
 DesktopWidget::DesktopWidget(QWidget *parent) :
@@ -55,12 +56,6 @@ void DesktopWidget::createView ()
     connect (iconBar_, SIGNAL(actionTriggered(QAction*)), SLOT(executeApplicationSlot(QAction*)));
 
     reloadIconBar ();
-
-    ui->horizontalWidget->hide ();
-
-    ui->spinBox->setRange (24, 300);
-    connect (ui->spinBox, SIGNAL(editingFinished()), SLOT(applySlot()));
-    connect (ui->applyButton, SIGNAL(clicked()), SLOT(applySlot()));
 }
 
 void DesktopWidget::reloadIconBar ()
@@ -170,25 +165,43 @@ void DesktopWidget::editSlot ()
     setDesktopWidget (desktopMode_);
     //setTransparentBackground (desktopMode_);
 
-    if (desktopMode_) ui->horizontalWidget->hide ();
-    else ui->horizontalWidget->show ();
-
-    ui->spinBox->setValue(iconSize_);
-
     hide ();
     show ();
 }
 
 void DesktopWidget::editListSlot ()
 {
+    DesktopWidgetDialog *dialog = new DesktopWidgetDialog;
 
+    dialog->setWindowTitle (tr("Settings"));
+
+    QVariantHash info;
+
+    info["icon_size"] = iconSize_;
+
+    dialog->setInfo (info);
+
+    if (dialog->exec () == QDialog::Accepted)
+    {
+        info = dialog->getInfo ();
+
+        iconSize_ = info["icon_size"].toInt ();
+
+        reloadIconBar ();
+
+        qDebug () << Q_FUNC_INFO << desktopMode_;
+
+        setDesktopWidget (desktopMode_);
+        hide ();
+        show ();
+    }
+
+    delete dialog;
 }
 
 void DesktopWidget::applySlot ()
 {
-    iconSize_ = ui->spinBox->value();
 
-    reloadIconBar ();
 }
 
 void DesktopWidget::executeApplication (const QString &path)
@@ -211,7 +224,8 @@ void DesktopWidget::executeApplicationSlot (QAction *action)
         }
     }
 
-    if (!path.isEmpty()){
+    if (!path.isEmpty())
+    {
         int len = path.length();
         int ind = path.indexOf (" ");
         if (ind != -1) path.remove (ind, len - ind);

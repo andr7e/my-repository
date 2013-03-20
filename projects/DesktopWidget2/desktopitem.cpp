@@ -5,6 +5,12 @@
 #include <QDebug>
 #include <QStringList>
 
+#define KEY_NAME "Name="
+#define KEY_COMMENT "Comment="
+#define KEY_ICON "Icon="
+#define KEY_EXEC "Exec="
+#define KEY_TYPE "Type="
+
 QHash <QString,QString> parseDesktopFormat (const QString &data);
 
 //Load DesktopItem from .desktop file
@@ -14,14 +20,15 @@ void DesktopItem::load (const QString &fname)
 
     QFile fd(fname);
 
-    if (fd.open(QIODevice::ReadOnly)){
+    if (fd.open(QIODevice::ReadOnly))
+    {
         QString data = fd.readAll();
 
         QHash <QString,QString> hash = parseDesktopFormat (data);
 
-        setName (hash["Name="]);
-        setIcon (hash["Icon="]);
-        setPath (hash["Exec="]);
+        setName (hash[KEY_NAME] + QString("\n") + hash[KEY_COMMENT]);
+        setIcon (hash[KEY_ICON]);
+        setPath (hash[KEY_EXEC]);
     }
 
 }
@@ -56,7 +63,7 @@ QHash <QString,QString> parseDesktopFormat (const QString &data)
     qDebug () << Q_FUNC_INFO << strList;
 
     QStringList keys;
-    keys << "Name=" << "Icon=" << "Type=" << "Exec=";
+    keys << KEY_NAME << KEY_COMMENT  << KEY_ICON << KEY_TYPE << KEY_EXEC;
 
     QHash <QString,QString> hash;
 
