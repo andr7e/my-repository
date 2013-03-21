@@ -4,14 +4,21 @@
 #include <QHash>
 #include <QDebug>
 #include <QStringList>
+#include <QTextCodec>
 
-#define KEY_NAME "Name="
-#define KEY_COMMENT "Comment="
-#define KEY_ICON "Icon="
-#define KEY_EXEC "Exec="
-#define KEY_TYPE "Type="
+#define KEY_NAME "Name"
+#define KEY_COMMENT "Comment"
+#define KEY_ICON "Icon"
+#define KEY_EXEC "Exec"
+#define KEY_TYPE "Type"
 
-QHash <QString,QString> parseDesktopFormat (const QString &data);
+QHash <QString,QString> parseDesktopFormat (const QByteArray &data);
+QString systemLanguage ();
+
+QString keyWithLang (const QString &key)
+{
+    return key + "[" + systemLanguage() + "]";
+}
 
 //Load DesktopItem from .desktop file
 void DesktopItem::load (const QString &fname)
@@ -22,11 +29,19 @@ void DesktopItem::load (const QString &fname)
 
     if (fd.open(QIODevice::ReadOnly))
     {
-        QString data = fd.readAll();
+        QByteArray data = fd.readAll();
 
         QHash <QString,QString> hash = parseDesktopFormat (data);
 
-        setName (hash[KEY_NAME] + QString("\n") + hash[KEY_COMMENT]);
+        QString name = hash[keyWithLang(KEY_NAME)];
+        if (name.isEmpty()) name = hash[KEY_NAME];
+
+        QString comment = hash[keyWithLang(KEY_COMMENT)];
+        if (comment.isEmpty()) comment = hash[KEY_COMMENT];
+
+        qDebug () << Q_FUNC_INFO << name;
+
+        setName (name + "\n" + comment);
         setIcon (hash[KEY_ICON]);
         setPath (hash[KEY_EXEC]);
     }
@@ -56,14 +71,38 @@ StartupNotify=true
 MimeType=application/postscript;application/pdf;
 */
 
-QHash <QString,QString> parseDesktopFormat (const QString &data)
+QString systemLanguage ()
 {
-    QStringList strList = data.split ("\n");
+    QString lang = QLocale::system().name();
+    return (lang.remove(2, lang.size() - 2));
+}
+
+QStringList makeKeys ()
+{
+    QString lang = QLocale::system().name();
+    qDebug () << Q_FUNC_INFO << (lang.remove(2, lang.size() - 2));
+
+    QStringList keys;
+    keys << KEY_NAME << KEY_COMMENT  << KEY_ICON << KEY_TYPE << KEY_EXEC << keyWithLang(KEY_NAME) << keyWithLang(KEY_COMMENT);
+
+    for (int i=0; i < keys.size (); i++)
+    {
+        keys[i] += "=";
+    }
+
+    return keys;
+}
+
+QHash <QString,QString> parseDesktopFormat (const QByteArray &data)
+{
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QString string = codec->toUnicode(data);
+
+    QStringList strList = string.split ("\n");
 
     qDebug () << Q_FUNC_INFO << strList;
 
-    QStringList keys;
-    keys << KEY_NAME << KEY_COMMENT  << KEY_ICON << KEY_TYPE << KEY_EXEC;
+    QStringList keys = makeKeys ();
 
     QHash <QString,QString> hash;
 
@@ -79,9 +118,11 @@ QHash <QString,QString> parseDesktopFormat (const QString &data)
                 {
                     str.remove(key);
 
-                    qDebug () << Q_FUNC_INFO << str;
+                    key.remove("=");
 
-                    hash[key] = str;
+                    qDebug () << Q_FUNC_INFO << key << str;
+
+                    if (!hash.contains(key)) hash[key] = str;
 
                     break;
                 }

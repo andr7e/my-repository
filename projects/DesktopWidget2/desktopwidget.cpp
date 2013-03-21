@@ -45,7 +45,7 @@ void DesktopWidget::createView ()
     addItem ("/usr/share/applications/qtcreator.desktop");
     */
 
-    //itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop";
+    itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop" << "/usr/share/applications/firefox.desktop" ;
 
     for (int i=0; i < itemPaths_.size(); i++) addItem (itemPaths_[i].toString());
 
@@ -73,8 +73,6 @@ void DesktopWidget::reloadIconBar ()
 
 DesktopWidget::~DesktopWidget()
 {
-    writeSettings ();
-
     removeItems ();
 
     delete ui;
@@ -102,9 +100,9 @@ void DesktopWidget::readSettings ()
     //qDebug () << Q_FUNC_INFO;
 
     QPoint pos (0,50);
-    QSize size (200,200);
+    QSize size (600,100);
 
-    readWindowSettings (pos, size);
+    readWindowSettings (pos, size, objectName());
 
     QSettings s;
 
@@ -121,7 +119,7 @@ void DesktopWidget::writeSettings ()
 {
     //qDebug () << Q_FUNC_INFO;
 
-    writeWindowSettings (pos (), size ());
+    writeWindowSettings (pos (), size (), objectName());
 
     QSettings s;
 
@@ -249,4 +247,9 @@ void DesktopWidget::contextMenuEvent(QContextMenuEvent *event)
     connect (exitAct, SIGNAL(triggered()), SLOT(close()));
 
     menu.exec(event->globalPos());
+}
+
+void DesktopWidget::closeEvent (QCloseEvent *)
+{
+    writeSettings ();
 }

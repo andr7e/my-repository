@@ -34,6 +34,8 @@ protected:
     //events
     void contextMenuEvent(QContextMenuEvent *event);
 
+    void closeEvent(QCloseEvent *);
+
 public:
     explicit DesktopWidget(QWidget *parent = 0);
     ~DesktopWidget();
