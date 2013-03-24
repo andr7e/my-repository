@@ -7,12 +7,13 @@
 #include <QSettings>
 #include <QFile>
 #include <QMenu>
+#include <QMessageBox>
 
 #include "desktopwidgetdialog.h"
 #include "utils.h"
 
 DesktopWidget::DesktopWidget(QWidget *parent) :
-    QWidget(parent), desktopMode_ (true), iconSize_(64),
+    QWidget(parent), desktopMode_ (true), iconSize_(64), direction_(0),
     ui(new Ui::DesktopWidget)
 {
     ui->setupUi(this);
@@ -24,6 +25,7 @@ DesktopWidget::DesktopWidget(QWidget *parent) :
     createView ();
 }
 
+//Items
 void DesktopWidget::addItem (const QString &fname)
 {
     DesktopItem desktopItem;
@@ -34,29 +36,38 @@ void DesktopWidget::addItem (const QString &fname)
 
 void DesktopWidget::removeItems ()
 {
-    for (int i=0; i < items.size(); i++) items.pop_back();
+    int size = items.size();
+    for (int i=0; i < size; i++) items.pop_back();
 }
 
+//View
 void DesktopWidget::createView ()
 {
-
-    /*
-    addItem ("/usr/share/applications/gimp.desktop");
-    addItem ("/usr/share/applications/qtcreator.desktop");
-    */
-
-    itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop" << "/usr/share/applications/firefox.desktop" ;
-
-    for (int i=0; i < itemPaths_.size(); i++) addItem (itemPaths_[i].toString());
-
     iconBar_ = new QToolBar;
 
     ui->verticalLayout->insertWidget(0, iconBar_);
 
     connect (iconBar_, SIGNAL(actionTriggered(QAction*)), SLOT(executeApplicationSlot(QAction*)));
 
+    reloadItems ();
+
     reloadIconBar ();
 }
+
+void DesktopWidget::reloadItems ()
+{
+    removeItems ();
+
+    /*
+    addItem ("/usr/share/applications/gimp.desktop");
+    addItem ("/usr/share/applications/qtcreator.desktop");
+    */
+
+    //itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop" << "/usr/share/applications/firefox.desktop" ;
+
+    for (int i=0; i < itemPaths_.size(); i++) addItem (itemPaths_[i]);
+}
+
 
 void DesktopWidget::reloadIconBar ()
 {
@@ -66,9 +77,19 @@ void DesktopWidget::reloadIconBar ()
 
     iconBar_->setIconSize (barSize);
 
-    for (int i=0 ; i< items.size(); i++){
-        actions_[i] = iconBar_->addAction(getResizedIcon (items[i].getIcon(), barSize), items[i].getName());
+    iconBar_->setOrientation(Qt::Orientation (direction_ + 1));
+
+    for (int i=0 ; i < items.size(); i++)
+    {
+        actions_[i] = iconBar_->addAction (getResizedIcon (items[i].getIcon(), barSize), items[i].getName());
     }
+
+    int width = iconSize_ * (items.size() + 1);
+    int height = iconSize_;
+
+    if (direction_) qSwap (width, height);
+
+    resize (QSize (width, height));
 }
 
 DesktopWidget::~DesktopWidget()
@@ -89,11 +110,11 @@ void DesktopWidget::mouseMoveEvent (QMouseEvent *pe)
     move (pe->globalPos() - pos_);
 }
 
-//////////////settings////////////////////
+//Settings
 
-#define KEY_ICON_SIZE_STRING "/settings/icon-size"
-
-#define KEY_ITEMS_LIST_STRING "/settings/items-list"
+#define KEY_ICON_SIZE_STRING "icon-size"
+#define KEY_DIRECTION_STRING "direction"
+#define KEY_ITEMS_LIST_STRING "items-list"
 
 void DesktopWidget::readSettings ()
 {
@@ -108,7 +129,9 @@ void DesktopWidget::readSettings ()
 
     iconSize_ = s.value (KEY_ICON_SIZE_STRING, 64).toInt();
 
-    itemPaths_ = s.value (KEY_ITEMS_LIST_STRING, QVariantList()).toList();
+    direction_ = s.value (KEY_DIRECTION_STRING, 0).toBool();
+
+    itemPaths_ = s.value (KEY_ITEMS_LIST_STRING, QStringList()).toStringList();
 
     //qDebug () << size.width ();
 
@@ -125,11 +148,14 @@ void DesktopWidget::writeSettings ()
 
     s.setValue (KEY_ICON_SIZE_STRING, iconSize_);
 
+    s.setValue (KEY_DIRECTION_STRING, direction_);
+
     s.setValue (KEY_ITEMS_LIST_STRING, itemPaths_);
 
     qDebug () << Q_FUNC_INFO << width() << " " << height();
 }
 
+//DesktopWidget
 void DesktopWidget::setDesktopWidgetFlags ()
 {
     setDesktopWidget (desktopMode_);
@@ -154,20 +180,13 @@ void DesktopWidget::setTransparentBackground (bool mode)
     setAttribute(Qt::WA_TranslucentBackground, mode);
 }
 
-void DesktopWidget::editSlot ()
+//Slots
+void DesktopWidget::aboutSlot ()
 {
-    qDebug () << Q_FUNC_INFO << desktopMode_;
-
-    desktopMode_=!desktopMode_;
-
-    setDesktopWidget (desktopMode_);
-    //setTransparentBackground (desktopMode_);
-
-    hide ();
-    show ();
+    QMessageBox::about (this, tr("About"), QApplication::applicationName());
 }
 
-void DesktopWidget::editListSlot ()
+void DesktopWidget::settingsSlot ()
 {
     DesktopWidgetDialog *dialog = new DesktopWidgetDialog;
 
@@ -175,7 +194,9 @@ void DesktopWidget::editListSlot ()
 
     QVariantHash info;
 
-    info["icon_size"] = iconSize_;
+    setIconSizeToHash (info, iconSize_);
+    setDirectionToHash (info, direction_);
+    setItemsToHash (info, itemPaths_);
 
     dialog->setInfo (info);
 
@@ -183,23 +204,23 @@ void DesktopWidget::editListSlot ()
     {
         info = dialog->getInfo ();
 
-        iconSize_ = info["icon_size"].toInt ();
+        iconSize_ = getIconSizeFromHash (info);
+        direction_ = getDirectionFromHash (info);
+        itemPaths_ = getItemsFromHash (info);
+
+        qDebug () << Q_FUNC_INFO << itemPaths_;
+
+        reloadItems();
 
         reloadIconBar ();
 
-        qDebug () << Q_FUNC_INFO << desktopMode_;
+        setDesktopWidgetFlags ();
 
-        setDesktopWidget (desktopMode_);
         hide ();
         show ();
     }
 
     delete dialog;
-}
-
-void DesktopWidget::applySlot ()
-{
-
 }
 
 void DesktopWidget::executeApplication (const QString &path)
@@ -237,19 +258,55 @@ void DesktopWidget::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
 
-    QAction *editAct = menu.addAction(tr("Edit"));
-    connect (editAct, SIGNAL(triggered()), SLOT(editSlot()));
+    QAction *settingsAct = menu.addAction(tr("Settings"));
+    connect (settingsAct, SIGNAL(triggered()), SLOT(settingsSlot()));
 
-    QAction *editListAct = menu.addAction(tr("Edit List"));
-    connect (editListAct, SIGNAL(triggered()), SLOT(editListSlot()));
+    QAction *aboutAct = menu.addAction(tr("About"));
+    connect (aboutAct, SIGNAL(triggered()), SLOT(aboutSlot()));
+
+    menu.addSeparator();
 
     QAction *exitAct = menu.addAction(tr("Exit"));
     connect (exitAct, SIGNAL(triggered()), SLOT(close()));
 
-    menu.exec(event->globalPos());
+    menu.exec (event->globalPos());
 }
 
 void DesktopWidget::closeEvent (QCloseEvent *)
 {
     writeSettings ();
+}
+
+//Hash
+//icon-size
+int DesktopWidget::getIconSizeFromHash (const QVariantHash &hash)
+{
+    return hash.value(KEY_ICON_SIZE_STRING).toInt ();
+}
+
+void DesktopWidget::setIconSizeToHash (QVariantHash &hash, int iconSize)
+{
+    setValueToHash (hash, KEY_ICON_SIZE_STRING, iconSize);
+}
+
+//direction
+bool DesktopWidget::getDirectionFromHash (const QVariantHash &hash)
+{
+    return hash.value(KEY_DIRECTION_STRING).toBool ();
+}
+
+void DesktopWidget::setDirectionToHash (QVariantHash &hash, bool direction)
+{
+    setValueToHash (hash, KEY_DIRECTION_STRING, direction);
+}
+
+//stringlist
+QStringList DesktopWidget::getItemsFromHash (const QVariantHash &hash)
+{
+    return hash.value(KEY_ITEMS_LIST_STRING).toStringList();
+}
+
+void DesktopWidget::setItemsToHash (QVariantHash &hash, const QStringList &list)
+{
+    setValueToHash (hash, KEY_ITEMS_LIST_STRING, list);
 }

@@ -1,4 +1,4 @@
-#include <QIcon>
+#include "utils.h"
 
 QIcon getResizedIcon (const QString &fname, const QSize &size)
 {
@@ -19,4 +19,9 @@ QIcon getResizedIcon (const QString &fname, const QSize &size)
     }
 
     return icon;
+}
+
+void setValueToHash (QVariantHash &hash, const QString &key, const QVariant &value)
+{
+    if (!hash.contains (key)) hash[key] = value;
 }

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QVariantHash>
+#include <QStringListModel>
 
 namespace Ui {
 class DesktopWidgetDialog;
@@ -21,6 +22,7 @@ public:
     
 private:
     Ui::DesktopWidgetDialog *ui;
+    QStringListModel *model_;
 };
 
 #endif // DESKTOPWIDGETDIALOG_H
