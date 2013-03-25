@@ -27,3 +27,6 @@ HEADERS  += desktopwidget.h \
 
 FORMS    += desktopwidget.ui \
     desktopwidgetdialog.ui
+
+RESOURCES += \
+    resource.qrc

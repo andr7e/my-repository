@@ -58,17 +58,12 @@ void DesktopWidget::reloadItems ()
 {
     removeItems ();
 
-    /*
-    addItem ("/usr/share/applications/gimp.desktop");
-    addItem ("/usr/share/applications/qtcreator.desktop");
-    */
-
     //itemPaths_ << "/usr/share/applications/gimp.desktop" << "/usr/share/applications/qtcreator.desktop" << "/usr/share/applications/firefox.desktop" ;
 
     for (int i=0; i < itemPaths_.size(); i++) addItem (itemPaths_[i]);
 }
 
-
+#define ICON_COEFFICIENT 1.1
 void DesktopWidget::reloadIconBar ()
 {
     QSize barSize = QSize (iconSize_, iconSize_);
@@ -84,8 +79,8 @@ void DesktopWidget::reloadIconBar ()
         actions_[i] = iconBar_->addAction (getResizedIcon (items[i].getIcon(), barSize), items[i].getName());
     }
 
-    int width = iconSize_ * (items.size() + 1);
-    int height = iconSize_;
+    int width = iconSize_ * (items.size() + 1) * ICON_COEFFICIENT;
+    int height = iconSize_ * ICON_COEFFICIENT;
 
     if (direction_) qSwap (width, height);
 
@@ -132,6 +127,8 @@ void DesktopWidget::readSettings ()
     direction_ = s.value (KEY_DIRECTION_STRING, 0).toBool();
 
     itemPaths_ = s.value (KEY_ITEMS_LIST_STRING, QStringList()).toStringList();
+
+    if (itemPaths_.isEmpty()) itemPaths_ << ":/qIconPanel.desktop";
 
     //qDebug () << size.width ();
 
