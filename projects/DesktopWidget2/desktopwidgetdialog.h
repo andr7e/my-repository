@@ -20,6 +20,15 @@ public:
     void setInfo (const QVariantHash &info);
     QVariantHash getInfo ();
     
+private slots:
+    void on_upButton_clicked();
+
+    void on_downButton_clicked();
+
+    void on_addButton_clicked();
+
+    void on_deleteButton_clicked();
+
 private:
     Ui::DesktopWidgetDialog *ui;
     QStringListModel *model_;

@@ -53,3 +53,63 @@ QVariantHash DesktopWidgetDialog::getInfo ()
 
     return info;
 }
+
+void DesktopWidgetDialog::on_upButton_clicked()
+{
+    QModelIndex index = ui->listView->currentIndex();
+
+    QModelIndex prevIndex = model_->index (index.row () - 1);
+
+    int count = model_->rowCount();
+
+    if (index.row () > 0 && count > 1)
+    {
+        QVariant tmp = prevIndex.data ();
+
+        model_->setData (prevIndex, index.data ());
+        model_->setData (index, tmp);
+
+        ui->listView->setCurrentIndex (prevIndex);
+
+        qDebug () << Q_FUNC_INFO << tmp;
+    }
+
+}
+
+void DesktopWidgetDialog::on_downButton_clicked()
+{
+    QModelIndex index = ui->listView->currentIndex();
+
+    QModelIndex nextIndex = model_->index (index.row () + 1);
+
+    int count = model_->rowCount();
+
+    if (index.row () < count - 1 && count > 1)
+    {
+        QVariant tmp = nextIndex.data ();
+
+        model_->setData (nextIndex, index.data ());
+        model_->setData (index, tmp);
+
+        ui->listView->setCurrentIndex (nextIndex);
+
+        qDebug () << Q_FUNC_INFO << tmp;
+    }
+}
+
+void DesktopWidgetDialog::on_addButton_clicked()
+{
+    QModelIndex index;
+
+    model_->insertRow (model_->rowCount(), index);
+
+    index = model_->index (model_->rowCount() - 1);
+
+    model_->setData(index, QString(":/qIconPanel.desktop"));
+}
+
+void DesktopWidgetDialog::on_deleteButton_clicked()
+{
+    QModelIndex index = ui->listView->currentIndex();
+    model_->removeRow (index.row ());
+}
