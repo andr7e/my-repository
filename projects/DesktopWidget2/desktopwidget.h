@@ -11,6 +11,8 @@
 
 #define MAX_ACTION 128
 
+#define APP_ICON_STRING ":/images/qiconpanel.png"
+
 namespace Ui {
 class DesktopWidget;
 }
@@ -34,6 +36,7 @@ protected:
     //events
     void contextMenuEvent(QContextMenuEvent *event);
 
+    void paintEvent(QPaintEvent *pe);
     void closeEvent(QCloseEvent *);
 
 public:
@@ -46,6 +49,12 @@ public:
     void createView ();
     void reloadItems ();
     void reloadIconBar ();
+
+    int getPanelWidth ();
+    int getPanelHeight();
+
+    int getWidth ();
+    int getHeight();
 
     void executeApplication (const QString &path);
 
@@ -64,6 +73,8 @@ public slots:
 
     void settingsSlot ();
     void aboutSlot ();
+
+    void hovered ();
     
 private:
     bool desktopMode_;

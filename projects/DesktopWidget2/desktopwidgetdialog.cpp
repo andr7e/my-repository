@@ -3,6 +3,9 @@
 
 #include <QStringListModel>
 #include <QDebug>
+#include <QLabel>
+#include <QIcon>
+
 #include "desktopwidget.h"
 
 DesktopWidgetDialog::DesktopWidgetDialog(QWidget *parent) :
@@ -14,6 +17,10 @@ DesktopWidgetDialog::DesktopWidgetDialog(QWidget *parent) :
     ui->spinBox->setRange (24, 300);
 
     model_ = new QStringListModel();
+
+    QIcon icon (APP_ICON_STRING);
+
+    ui->iconLabel->setPixmap(icon.pixmap(QSize (64,64)));
 }
 
 DesktopWidgetDialog::~DesktopWidgetDialog()

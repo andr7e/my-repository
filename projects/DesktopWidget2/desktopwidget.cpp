@@ -8,6 +8,8 @@
 #include <QFile>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPainter>
+#include <QPixmap>
 
 #include "desktopwidgetdialog.h"
 #include "utils.h"
@@ -43,7 +45,7 @@ void DesktopWidget::removeItems ()
 //View
 void DesktopWidget::createView ()
 {
-    iconBar_ = new QToolBar;
+    iconBar_ = new QToolBar (this);
 
     ui->verticalLayout->insertWidget(0, iconBar_);
 
@@ -64,6 +66,34 @@ void DesktopWidget::reloadItems ()
 }
 
 #define ICON_COEFFICIENT 1.1
+
+int DesktopWidget::getPanelWidth ()
+{
+    return iconSize_ * (items.size() + 1) * ICON_COEFFICIENT;
+}
+
+int DesktopWidget::getPanelHeight()
+{
+    return iconSize_ * ICON_COEFFICIENT;
+}
+
+int DesktopWidget::getWidth()
+{
+    if (!direction_) return getPanelWidth ();
+    else return getPanelHeight ();
+}
+
+int DesktopWidget::getHeight()
+{
+    if (!direction_) return getPanelHeight ();
+    else return getPanelWidth ();
+}
+
+void DesktopWidget::hovered ()
+{
+    qDebug () << Q_FUNC_INFO << "hovered";
+}
+
 void DesktopWidget::reloadIconBar ()
 {
     QSize barSize = QSize (iconSize_, iconSize_);
@@ -77,14 +107,11 @@ void DesktopWidget::reloadIconBar ()
     for (int i=0 ; i < items.size(); i++)
     {
         actions_[i] = iconBar_->addAction (getResizedIcon (items[i].getIcon(), barSize), items[i].getName());
+
+        //connect (actions_[i] , SIGNAL(hovered()), SLOT(hovered()));
     }
 
-    int width = iconSize_ * (items.size() + 1) * ICON_COEFFICIENT;
-    int height = iconSize_ * ICON_COEFFICIENT;
-
-    if (direction_) qSwap (width, height);
-
-    resize (QSize (width, height));
+    resize (QSize (getWidth (), getHeight ()));
 }
 
 DesktopWidget::~DesktopWidget()
@@ -245,6 +272,7 @@ void DesktopWidget::executeApplicationSlot (QAction *action)
         int len = path.length();
         int ind = path.indexOf (" ");
         if (ind != -1) path.remove (ind, len - ind);
+
         executeApplication (path);
     }
     else
@@ -258,8 +286,8 @@ void DesktopWidget::contextMenuEvent(QContextMenuEvent *event)
     QAction *settingsAct = menu.addAction(tr("Settings"));
     connect (settingsAct, SIGNAL(triggered()), SLOT(settingsSlot()));
 
-    QAction *aboutAct = menu.addAction(tr("About"));
-    connect (aboutAct, SIGNAL(triggered()), SLOT(aboutSlot()));
+    //QAction *aboutAct = menu.addAction(tr("About"));
+    //connect (aboutAct, SIGNAL(triggered()), SLOT(aboutSlot()));
 
     menu.addSeparator();
 
@@ -267,6 +295,23 @@ void DesktopWidget::contextMenuEvent(QContextMenuEvent *event)
     connect (exitAct, SIGNAL(triggered()), SLOT(close()));
 
     menu.exec (event->globalPos());
+}
+
+int count = 0;
+void DesktopWidget::paintEvent(QPaintEvent *pe)
+{
+    /*
+    QPainter p (this);
+
+    p.setPen (Qt::transparent);
+    p.setBrush (QColor (127, 127, 127, 127));
+
+    p.drawRect (0, 0, pe->rect().width (), pe->rect().height ());
+
+    qDebug () << Q_FUNC_INFO << "paint" << count;
+
+    count++;
+    */
 }
 
 void DesktopWidget::closeEvent (QCloseEvent *)

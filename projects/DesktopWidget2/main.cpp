@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QBitmap>
 #include "desktopwidget.h"
 
 #define ORG_MAME "AEFR"
