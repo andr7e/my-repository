@@ -20,7 +20,7 @@ private:
     QString releaseName_;
 
     //MotherboardInfo
-    QString motherBoard_[5];
+    QHash <QString, QString> motherBoard_;
 
     //MemoryInfo
     quint32 totalMem_;
@@ -35,7 +35,7 @@ private:
     QString arch_;
 
     //LspciInfo
-    QString lspciInfo_[5];
+    QHash <QString, QString> lspciInfo_;
 
     //CpuInfo
     QHash <QString, QString> cpuMap_;
@@ -102,14 +102,6 @@ public:
     bool LoadSystemInfo ();
     bool LoadLspciInfo ();
     bool LoadCpuInfo ();
-
-    
-private slots:
-    void on_closeButton_clicked();
-
-
-signals:
-    void close();
 };
 
 #endif // SYSTEMINFO_H

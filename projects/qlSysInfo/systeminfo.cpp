@@ -80,8 +80,3 @@ SystemInfo::~SystemInfo()
 {
     delete ui;
 }
-
-void SystemInfo::on_closeButton_clicked()
-{
-    emit close();
-}

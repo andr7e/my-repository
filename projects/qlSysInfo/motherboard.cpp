@@ -1,6 +1,12 @@
 #include <fstream>
 #include "systeminfo.h"
 
+#define KEY_BOARD_VENDOR "board_vendor"
+#define KEY_BOARD_NAME "board_name"
+#define KEY_BIOS_VENDOR "bios_vendor"
+#define KEY_BIOS_VER "bios_version"
+#define KEY_BIOS_DATE "bios_date"
+
 #define MOBO_BASE "/sys/devices/virtual/dmi/id/"
 
 bool GetLineFromFile (const char *fname, char *line){
@@ -15,48 +21,44 @@ bool GetLineFromFile (const char *fname, char *line){
     return 0;
 }
 
-bool GetMoboInfo (const char *value, char *line){
+bool GetMoboInfo (const char *key, char *value){
     char path[256];
-    sprintf (path, "%s%s", MOBO_BASE, value);
+    sprintf (path, "%s%s", MOBO_BASE, key);
 
-    return GetLineFromFile (path, line);
+    return GetLineFromFile (path, value);
 }
 
 bool
 SystemInfo::
 LoadMotherboardInfo (){
     QVector <QString> mobo;
-    mobo << "board_vendor" << "board_name" << "bios_vendor" << "bios_version" << "bios_date";
+    mobo << KEY_BOARD_VENDOR << KEY_BOARD_NAME << KEY_BIOS_VENDOR << KEY_BIOS_VER << KEY_BIOS_DATE;
+
     char tmp[256];
 
-    for (int i=0; i<mobo.size(); i++){
-        GetMoboInfo (mobo[i].toStdString().c_str(), tmp);
-        motherBoard_[i] = (tmp);
+    for (int i=0; i < mobo.size(); i++){
+        QString key = mobo[i];
+        GetMoboInfo (key.toStdString().c_str(), tmp);
+        motherBoard_[key] = (tmp);
     }
 
     return 1;
 }
 
 QString&
-SystemInfo::GetMotherboardInfo (int ind){
-    if (ind<0 || ind>=5) ind=0;
-    return motherBoard_[ind];
-}
+SystemInfo::GetMotherboardManufacturer (){ return motherBoard_[KEY_BOARD_VENDOR];}
 
 QString&
-SystemInfo::GetMotherboardManufacturer (){ return motherBoard_[0];}
+SystemInfo::GetMotherboardModel (){ return motherBoard_[KEY_BOARD_NAME];}
 
 QString&
-SystemInfo::GetMotherboardModel (){ return motherBoard_[1];}
+SystemInfo::GetBiosVendor (){ return motherBoard_[KEY_BIOS_VENDOR];}
 
 QString&
-SystemInfo::GetBiosVendor (){ return motherBoard_[2];}
+SystemInfo::GetBiosVersion (){ return motherBoard_[KEY_BIOS_VER];}
 
 QString&
-SystemInfo::GetBiosVersion (){ return motherBoard_[3];}
-
-QString&
-SystemInfo::GetBiosDate (){ return motherBoard_[4];}
+SystemInfo::GetBiosDate (){ return motherBoard_[KEY_BIOS_DATE];}
 
 
 
