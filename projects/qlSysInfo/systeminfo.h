@@ -19,8 +19,6 @@ private:
     QString distroName_;
     QString releaseName_;
 
-    //MotherboardInfo
-    QHash <QString, QString> motherBoard_;
 
     //MemoryInfo
     quint32 totalMem_;
@@ -34,74 +32,82 @@ private:
     QString kversion_;
     QString arch_;
 
+    //Resolution
+    quint32 screenW_;
+    quint32 screenH_;
+
     //LspciInfo
     QHash <QString, QString> lspciInfo_;
 
     //CpuInfo
-    QHash <QString, QString> cpuMap_;
-    QVector <QString> cpuKeys_;
+    QHash <QString, QString> cpuInfo_;
 
-    //Resolution
-    quint32 screenW_;
-    quint32 screenH_;
+    //MotherboardInfo
+    QHash <QString, QString> moboInfo_;
 
 public:
     explicit SystemInfo(QWidget *parent = 0);
     ~SystemInfo();
 
     //Release
-    QString& GetDistroName ();
-    QString& GetReleaseName ();
+    QString GetDistroName () const;
+    QString GetReleaseName () const;
 
     //Memory
-    quint32 GetTotalMemory();
-    quint32 GetFreeMemory();
-    quint32 GetTotalSwap();
-    quint32 GetFreeSwap();
+    quint32 GetTotalMemory() const;
+    quint32 GetFreeMemory() const;
+    quint32 GetUsedMemory() const;
+
+    quint32 GetTotalSwap() const;
+    quint32 GetFreeSwap() const;
+    quint32 GetUsedSwap() const;
 
     //System
-    QString& GetHostname ();
-    QString& GetKernel ();
-    QString& GetKVersion ();
-    QString& GetArch ();
+    QString GetHostname () const;
+    QString GetKernel () const;
+    QString GetKVersion () const;
+    QString GetArch () const;
 
     //Lspci
-    QString& GetChipset ();
-    QString& GetVideocard ();
-    QString& GetAudiocard ();
-    QString& GetEthernet ();
-    QString& GetNetwork ();
+    QString GetChipset () const;
+    QString GetVideocard () const;
+    QString GetAudiocard () const;
+    QString GetEthernet () const;
+    QString GetNetwork () const;
 
     //Cpu
-    QString& GetCpuVendor ();
-    QString& GetCpuModelName ();
-    QString& GetCpuCores ();
-    QString& GetCpuCoreClock ();
-    QString& GetCpuCacheSize ();
-    QString& GetCpuBogomips ();
-    QString& GetCpuFamily ();
-    QString& GetCpuModel ();
-    QString& GetCpuStepping ();
+    QString GetCpuVendor () const;
+    QString GetCpuModelName () const;
+    QString GetCpuCores () const;
+    QString GetCpuCoreClock () const;
+    QString GetCpuCacheSize () const;
+    QString GetCpuBogomips () const;
+    QString GetCpuFamily () const;
+    QString GetCpuModel () const;
+    QString GetCpuStepping () const;
 
     //Motherboard
-    QString& GetMotherboardManufacturer ();
-    QString& GetMotherboardModel ();
+    QString GetMotherboardManufacturer () const;
+    QString GetMotherboardModel () const;
 
-    QString& GetBiosVendor ();
-    QString& GetBiosVersion ();
-    QString& GetBiosDate ();
+    QString GetBiosVendor () const;
+    QString GetBiosVersion () const;
+    QString GetBiosDate () const;
 
-    //Multi
-    QString& GetMotherboardInfo (int ind);
-    quint32 GetMemoryInfo (int ind);
-    QString& GetCpuInfo (int ind);
-
+    //Loading
     bool LoadReleaseInfo ();
     bool LoadMotherboardInfo ();
     bool LoadMemoryInfo ();
     bool LoadSystemInfo ();
     bool LoadLspciInfo ();
     bool LoadCpuInfo ();
+
+    void LoadAllInfo ();
+    void copyDataToView ();
+
+private slots:
+    void on_refreshButton_clicked();
+    void on_shotButton_clicked();
 };
 
 #endif // SYSTEMINFO_H

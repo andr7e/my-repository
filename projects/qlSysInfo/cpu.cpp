@@ -1,84 +1,74 @@
-#include <fstream>
+#include <QFile>
+
 #include "systeminfo.h"
+#include "utils.h"
 
 #define PROC_CPUINFO "/proc/cpuinfo"
 //#define PROC_MEMINFO "/proc/meminfo"
 
-#define CPU_BUF_MAX_SIZE 512
-void ParseCpuInfo (std::ifstream &in, QHash <QString, QString> &map, QVector<QString> &names){
-    int count=0;
-    char line[CPU_BUF_MAX_SIZE];
-    int values = names.size();
+#define KEY_CPU_VENDOR      "vendor_id"
+#define KEY_CPU_MODEL_NAME  "model name"
+#define KEY_CPU_CORES       "cpu cores"
+#define KEY_CPU_FREQ        "cpu MHz"
+#define KEY_CPU_CACHE       "cache size"
+#define KEY_CPU_BOGOMIPS    "bogomips"
+#define KEY_CPU_FAMILY      "family"
+#define KEY_CPU_MODEL       "model"
+#define KEY_CPU_STEPPING    "stepping"
 
-    while (!in.eof() && count < values){
-        in.getline (line, CPU_BUF_MAX_SIZE-1, '\n');
+bool SystemInfo::LoadCpuInfo ()
+{
 
-        if (strlen(line)<2) break;
+    QStringList cpuKeys;
+    cpuKeys << KEY_CPU_VENDOR << KEY_CPU_MODEL_NAME << KEY_CPU_CORES
+             << KEY_CPU_FREQ  << KEY_CPU_CACHE << KEY_CPU_BOGOMIPS
+             << KEY_CPU_FAMILY << KEY_CPU_MODEL << KEY_CPU_STEPPING;
 
-        for (int i=0; i < values; i++){
-            const char *pItem=(names[i]).toStdString().c_str();
-            if (strstr (line, pItem)){
-                char *p=line+strlen(pItem);
-                while  (*p !=':') *p++;
-                while  (*p ==':' || *p ==' ') *p++;
 
-                map[names[i]]=p;
-                count++;
-
-                break;
-            }
-        }
-    }
+    return Utils::ParseInfo (PROC_CPUINFO, cpuInfo_, cpuKeys);
 }
 
-bool
-SystemInfo::
-LoadCpuInfo (){
-    cpuKeys_ << "vendor_id" << "model name" << "cpu cores" << "cpu MHz" << "cache size" << "bogomips" << "family" << "model" << "stepping";
-
-    std::ifstream in (PROC_CPUINFO);
-
-    if (in){
-        ParseCpuInfo (in, cpuMap_, cpuKeys_);
-        in.close();
-        //qDebug()<<cpuMap_;
-
-        return 1;
-    }
-
-    return 0;
+QString SystemInfo::GetCpuVendor () const
+{
+    return cpuInfo_[KEY_CPU_VENDOR];
 }
 
-QString&
-SystemInfo::
-GetCpuInfo (int ind){
-    if (ind<0 || ind>=cpuKeys_.size()) ind=0;
-    return cpuMap_[cpuKeys_[ind]];
+QString SystemInfo::GetCpuModelName () const
+{
+    return cpuInfo_[KEY_CPU_MODEL_NAME];
 }
 
-QString&
-SystemInfo::GetCpuVendor (){ return cpuMap_[cpuKeys_[0]];}
+QString SystemInfo::GetCpuCores () const
+{
+    return cpuInfo_[KEY_CPU_CORES];
+}
 
-QString&
-SystemInfo::GetCpuModelName (){ return cpuMap_[cpuKeys_[1]];}
+QString SystemInfo::GetCpuCoreClock () const
+{
+    return cpuInfo_[KEY_CPU_FREQ];
+}
 
-QString&
-SystemInfo::GetCpuCores (){ return cpuMap_[cpuKeys_[2]];}
+QString SystemInfo::GetCpuCacheSize () const
+{
+    return cpuInfo_[KEY_CPU_CACHE];
+}
 
-QString&
-SystemInfo::GetCpuCoreClock (){ return cpuMap_[cpuKeys_[3]];}
+QString SystemInfo::GetCpuBogomips () const
+{
+    return cpuInfo_[KEY_CPU_BOGOMIPS];
+}
 
-QString&
-SystemInfo::GetCpuCacheSize (){ return cpuMap_[cpuKeys_[4]];}
+QString SystemInfo::GetCpuFamily () const
+{
+    return cpuInfo_[KEY_CPU_FAMILY];
+}
 
-QString&
-SystemInfo::GetCpuBogomips (){ return cpuMap_[cpuKeys_[5]];}
+QString SystemInfo::GetCpuModel () const
+{
+    return cpuInfo_[KEY_CPU_MODEL];
+}
 
-QString&
-SystemInfo::GetCpuFamily (){ return cpuMap_[cpuKeys_[6]];}
-
-QString&
-SystemInfo::GetCpuModel (){ return cpuMap_[cpuKeys_[7]];}
-
-QString&
-SystemInfo::GetCpuStepping (){ return cpuMap_[cpuKeys_[8]];}
+QString SystemInfo::GetCpuStepping () const
+{
+    return cpuInfo_[KEY_CPU_STEPPING];
+}

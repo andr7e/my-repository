@@ -19,8 +19,13 @@ SOURCES += main.cpp\
     motherboard.cpp \
     memory.cpp \
     lspci.cpp \
-    cpu.cpp
+    cpu.cpp \
+    utils.cpp
 
-HEADERS  += systeminfo.h
+HEADERS  += systeminfo.h \
+    utils.h
 
 FORMS    += systeminfo.ui
+
+RESOURCES += \
+    resource.qrc

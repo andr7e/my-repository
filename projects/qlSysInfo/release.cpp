@@ -1,44 +1,72 @@
-#include <fstream>
+#include <QFile>
 #include "systeminfo.h"
 
 #define ETC_RELEASE "/etc/lsb-release"
 
-bool
-SystemInfo::
-LoadReleaseInfo (){
-    const char *release_name[]={"DISTRIB_ID=", "DISTRIB_RELEASE=", "DISTRIB_CODENAME="};
+#define KEY_DISTR_ID "DISTRIB_ID="
+#define KEY_DISTR_RELEASE "DISTRIB_RELEASE="
+#define KEY_DISTR_CODENAME "DISTRIB_CODENAME="
 
-    std::ifstream in (ETC_RELEASE);
+bool SystemInfo::LoadReleaseInfo ()
+{
+    QStringList distrList;
+    distrList << KEY_DISTR_ID << KEY_DISTR_RELEASE << KEY_DISTR_CODENAME;
 
-    if (in){
-        char line[256];
+    QFile fd (ETC_RELEASE);
 
-        in.getline (line, 255, '\n');
-        if (strstr (line, release_name[0])){
-            distroName_=(line+strlen(release_name[0]));
+    fd.open(QIODevice::ReadOnly);
+
+    if (fd.isOpen())
+    {
+        while (!fd.atEnd())
+        {
+            int ind = 0;
+            QString line = fd.readLine ();
+            line.remove ("\n");
+
+            //qDebug () << Q_FUNC_INFO << line;
+
+            ind = line.indexOf (KEY_DISTR_ID);
+            if (ind >= 0)
+            {
+                line.remove (KEY_DISTR_ID);
+                distroName_ = line;
+            }
+            else
+            {
+                ind = line.indexOf (KEY_DISTR_RELEASE);
+                if (ind >= 0)
+                {
+                    line.remove (KEY_DISTR_RELEASE);
+                    releaseName_ = line;
+                }
+                else
+                {
+                    ind = line.indexOf (KEY_DISTR_CODENAME);
+                    if (ind >= 0)
+                    {
+                        line.remove (KEY_DISTR_CODENAME);
+                        releaseName_.append (" ");
+                        releaseName_.append (line);
+                    }
+                }
+            }
         }
 
-        in.getline (line, 255, '\n');
-        if (strstr (line, release_name[1])){
-            releaseName_ =(line+strlen(release_name[1]));
-        }
-
-        in.getline (line, 255, '\n');
-        if (strstr (line, release_name[2])){
-            releaseName_.append (" ");
-            releaseName_.append (line+strlen(release_name[2]));
-        }
+        fd.close();
 
         return 1;
     }
 
-    in.close();
-
     return 0;
 }
 
-QString&
-SystemInfo::GetDistroName (){ return distroName_;}
+QString SystemInfo::GetDistroName () const
+{
+    return distroName_;
+}
 
-QString&
-SystemInfo::GetReleaseName (){ return releaseName_;}
+QString SystemInfo::GetReleaseName () const
+{
+    return releaseName_;
+}

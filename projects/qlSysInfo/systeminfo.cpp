@@ -1,6 +1,7 @@
 #include "systeminfo.h"
 #include "ui_systeminfo.h"
 
+#define APP_ICON_STRING ":/images/iconsysinfo.png"
 
 SystemInfo::SystemInfo(QWidget *parent) :
     QMainWindow(parent),
@@ -8,6 +9,18 @@ SystemInfo::SystemInfo(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    LoadAllInfo ();
+
+    copyDataToView ();
+}
+
+SystemInfo::~SystemInfo()
+{
+    delete ui;
+}
+
+void SystemInfo::LoadAllInfo ()
+{
     LoadReleaseInfo ();
     LoadMotherboardInfo ();
     LoadMemoryInfo ();
@@ -15,15 +28,14 @@ SystemInfo::SystemInfo(QWidget *parent) :
     LoadLspciInfo ();
     LoadCpuInfo ();
 
-    QDesktopWidget desk;
+    QDesktopWidget desktop;
+    screenW_ = desktop.width();
+    screenH_ = desktop.height();
+}
+
+void SystemInfo::copyDataToView ()
+{
     QString tmp;
-    screenW_=desk.width();
-    screenH_=desk.height();
-/*
-    qDebug() << "desk.widthMM:" << desk.widthMM();
-    qDebug() << "desk.widthMM:" << desk.heightMM();
-    qDebug() << "px_width: " << desk.width();
-    qDebug() << "px_height: " << desk.height();*/
 
     ui->lineEdit_mb1->setText (GetMotherboardManufacturer());
     ui->lineEdit_mb2->setText (GetMotherboardModel());
@@ -55,15 +67,15 @@ SystemInfo::SystemInfo(QWidget *parent) :
     ui->textEdit_dev3->setText (GetEthernet() + '\n' + GetNetwork());
 
 
-    tmp.sprintf ("%d/%d Mb", GetFreeMemory(), GetTotalMemory());
+    tmp.sprintf ("%d/%d Mb", GetUsedMemory(), GetTotalMemory());
     ui->lineEdit_mem1->setText (tmp);
     ui->progressBar_1->setRange (0, GetTotalMemory());
-    ui->progressBar_1->setValue (GetTotalMemory() - GetFreeMemory());
+    ui->progressBar_1->setValue (GetUsedMemory());
 
-    tmp.sprintf ("%d/%d Mb", GetFreeSwap(), GetTotalSwap());
+    tmp.sprintf ("%d/%d Mb", GetUsedSwap(), GetTotalSwap());
     ui->lineEdit_mem2->setText (tmp);
     ui->progressBar_2->setRange (0, GetTotalSwap());
-    ui->progressBar_2->setValue (GetTotalSwap() - GetFreeSwap());
+    ui->progressBar_2->setValue (GetUsedSwap());
 
     ui->label_com1->setText ("<html><head/><body><p><span style='font-size:14pt; font-weight:600;'>" + GetHostname () + "</span></p></body></html>");
     ui->label_com2->setText ("<html><head/><body><p><span style='font-size:14pt; font-weight:600;'>" + GetDistroName () + "</span></p></body></html>");
@@ -74,9 +86,31 @@ SystemInfo::SystemInfo(QWidget *parent) :
     ui->label_com7->setText ("Memory: " +  tmp);
     ui->label_com6->setText ("CPU: " + GetCpuModelName() + " x " + GetCpuCores());
 
+    QIcon icon (APP_ICON_STRING);
+    ui->iconLabel->setPixmap(icon.pixmap(QSize (70,70)));
 }
 
-SystemInfo::~SystemInfo()
+void SystemInfo::on_refreshButton_clicked()
 {
-    delete ui;
+    LoadAllInfo ();
+
+    copyDataToView ();
+}
+
+
+void SystemInfo::on_shotButton_clicked()
+{
+    //QPixmap pixmap = QPixmap::grabWindow(winId());
+    QPixmap pixmap = QPixmap::grabWindow(QApplication::desktop()->winId(), pos().x(), pos().y(), size().width() + 5, size().height() + 30);
+
+    QString format = "png";
+    QString initialPath = QDir::currentPath() + tr("/screenshot.") + format;
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"),
+                               initialPath,
+                               tr("%1 Files (*.%2);;All Files (*)")
+                               .arg(format.toUpper())
+                               .arg(format));
+
+    if (!fileName.isEmpty()) pixmap.save(fileName, format.toAscii());
 }
