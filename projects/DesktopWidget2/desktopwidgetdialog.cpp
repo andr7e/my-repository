@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QLabel>
 #include <QIcon>
+#include <QFileDialog>
 
 #include "desktopwidget.h"
 
@@ -106,6 +107,7 @@ void DesktopWidgetDialog::on_downButton_clicked()
 
 void DesktopWidgetDialog::on_addButton_clicked()
 {
+    /*
     QModelIndex index;
 
     model_->insertRow (model_->rowCount(), index);
@@ -113,6 +115,27 @@ void DesktopWidgetDialog::on_addButton_clicked()
     index = model_->index (model_->rowCount() - 1);
 
     model_->setData(index, QString(":/qIconPanel.desktop"));
+    */
+
+    QString format = "desktop";
+    QString initialPath;
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Add"),
+                               initialPath,
+                               tr("%1 Files (*.%2);;All Files (*)")
+                               .arg(format.toUpper())
+                               .arg(format));
+
+    if ( ! fileName.isEmpty())
+    {
+        QModelIndex index;
+
+        model_->insertRow (model_->rowCount(), index);
+
+        index = model_->index (model_->rowCount() - 1);
+
+        model_->setData(index, fileName);
+    }
 }
 
 void DesktopWidgetDialog::on_deleteButton_clicked()
