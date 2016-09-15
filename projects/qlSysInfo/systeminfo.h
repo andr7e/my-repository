@@ -45,9 +45,14 @@ private:
     //MotherboardInfo
     QHash <QString, QString> moboInfo_;
 
+    QAction *refreshAction_;
+    QAction *makeScreenshotAction_;
+
 public:
     explicit SystemInfo(QWidget *parent = 0);
     ~SystemInfo();
+
+    void createActions();
 
     //Release
     QString GetDistroName () const;
@@ -106,8 +111,8 @@ public:
     void copyDataToView ();
 
 private slots:
-    void on_refreshButton_clicked();
-    void on_shotButton_clicked();
+    void refresh();
+    void makeScreenshot();
 };
 
 #endif // SYSTEMINFO_H

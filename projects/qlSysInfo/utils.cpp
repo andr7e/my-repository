@@ -6,7 +6,7 @@ Utils::Utils()
 {
 }
 
-bool Utils::ParseInfo (const char *fname, QHash <QString, QString> &map, const QStringList &keys)
+bool Utils::ParseInfo (const QString &fname, QHash <QString, QString> &map, const QStringList &keys)
 {
     QFile fd(fname);
 
@@ -32,7 +32,7 @@ bool Utils::ParseInfo (const char *fname, QHash <QString, QString> &map, const Q
                     ind = line.indexOf(":");
                     if (ind >= 0) line.remove (0, ind + 1);
 
-                    map[key] = line;
+                    map[key] = line.simplified();
 
                     break;
                 }

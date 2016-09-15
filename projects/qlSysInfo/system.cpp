@@ -9,7 +9,7 @@ bool SystemInfo::LoadSystemInfo ()
     {
         kernel_.sprintf ("%s %s", info.sysname, info.release);
         kversion_ = info.version;
-        arch_ = info.machine;
+        arch_     = info.machine;
         hostname_ = info.nodename;
 
         return 1;

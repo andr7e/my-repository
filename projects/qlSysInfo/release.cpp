@@ -3,8 +3,8 @@
 
 #define ETC_RELEASE "/etc/lsb-release"
 
-#define KEY_DISTR_ID "DISTRIB_ID="
-#define KEY_DISTR_RELEASE "DISTRIB_RELEASE="
+#define KEY_DISTR_ID       "DISTRIB_ID="
+#define KEY_DISTR_RELEASE  "DISTRIB_RELEASE="
 #define KEY_DISTR_CODENAME "DISTRIB_CODENAME="
 
 bool SystemInfo::LoadReleaseInfo ()

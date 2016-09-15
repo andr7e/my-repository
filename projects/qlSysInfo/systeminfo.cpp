@@ -1,6 +1,9 @@
 #include "systeminfo.h"
 #include "ui_systeminfo.h"
 
+#include <QDesktopWidget>
+#include <QFileDialog>
+
 #define APP_ICON_STRING ":/images/iconsysinfo.png"
 
 SystemInfo::SystemInfo(QWidget *parent) :
@@ -11,12 +14,31 @@ SystemInfo::SystemInfo(QWidget *parent) :
 
     LoadAllInfo ();
 
+    createActions();
+
     copyDataToView ();
+
+    setWindowIcon(QIcon(APP_ICON_STRING));
 }
 
 SystemInfo::~SystemInfo()
 {
     delete ui;
+}
+
+void SystemInfo::createActions()
+{
+    refreshAction_ = new QAction(QIcon::fromTheme("view-refresh"), tr("Refresh"), this);
+    refreshAction_->setShortcut(QKeySequence::Refresh);
+    connect(refreshAction_, SIGNAL(triggered()), SLOT(refresh()));
+
+    makeScreenshotAction_ = new QAction(QIcon::fromTheme("insert-image", QIcon(":/images/screenshot.png")), tr("Make Screenshot"), this);
+    connect(makeScreenshotAction_, SIGNAL(triggered()), SLOT(makeScreenshot()));
+
+    addAction(refreshAction_);
+
+    ui->toolBar->addAction(refreshAction_);
+    ui->toolBar->addAction(makeScreenshotAction_);
 }
 
 void SystemInfo::LoadAllInfo ()
@@ -66,7 +88,7 @@ void SystemInfo::copyDataToView ()
 
     ui->textEdit_dev3->setText (GetEthernet() + '\n' + GetNetwork());
 
-
+    //
     tmp.sprintf ("%d/%d Mb", GetUsedMemory(), GetTotalMemory());
     ui->lineEdit_mem1->setText (tmp);
     ui->progressBar_1->setRange (0, GetTotalMemory());
@@ -90,17 +112,15 @@ void SystemInfo::copyDataToView ()
     ui->iconLabel->setPixmap(icon.pixmap(QSize (70,70)));
 }
 
-void SystemInfo::on_refreshButton_clicked()
+void SystemInfo::refresh()
 {
     LoadAllInfo ();
 
     copyDataToView ();
 }
 
-
-void SystemInfo::on_shotButton_clicked()
+void SystemInfo::makeScreenshot()
 {
-    //QPixmap pixmap = QPixmap::grabWindow(winId());
     QPixmap pixmap = QPixmap::grabWindow(QApplication::desktop()->winId(), pos().x(), pos().y(), size().width() + 5, size().height() + 30);
 
     QString format = "png";
@@ -112,5 +132,5 @@ void SystemInfo::on_shotButton_clicked()
                                .arg(format.toUpper())
                                .arg(format));
 
-    if (!fileName.isEmpty()) pixmap.save(fileName, format.toAscii());
+    if (!fileName.isEmpty()) pixmap.save(fileName, format.toLatin1());
 }
