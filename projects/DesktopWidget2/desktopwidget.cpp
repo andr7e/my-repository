@@ -187,8 +187,8 @@ void DesktopWidget::setDesktopWidgetFlags ()
     setTransparentBackground (desktopMode_);
 
     Qt::WindowFlags flags = 0;
-    //flags |= Qt::FramelessWindowHint;
-    //flags |= Qt::Tool;
+    flags |= Qt::FramelessWindowHint;
+    flags |= Qt::Tool;
     flags |= Qt::WindowStaysOnBottomHint;
 
     setWindowFlags(flags);
@@ -212,7 +212,7 @@ void DesktopWidget::aboutSlot ()
 
 void DesktopWidget::settingsSlot ()
 {
-    DesktopWidgetDialog *dialog = new DesktopWidgetDialog;
+    DesktopWidgetDialog *dialog = new DesktopWidgetDialog(this);
 
     dialog->setWindowTitle (tr("Settings"));
 

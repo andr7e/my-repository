@@ -1,9 +1,10 @@
 #include <QApplication>
 #include <QBitmap>
+
 #include "desktopwidget.h"
 
 #define ORG_MAME "AEFR"
-#define APP_MAME "PanelWidget"
+#define APP_MAME "DesktopWidget"
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +14,6 @@ int main(int argc, char *argv[])
     a.setApplicationName (APP_MAME);
 
     DesktopWidget w;
-
     w.show();
     
     return a.exec();
